@@ -1,0 +1,15 @@
+[submodule "libs/cxxitimer"]
+	path = libs/cxxitimer
+	url = https://github.com/NikolasK-source/cxxitimer.git
+[submodule "libs/cxxendian"]
+	path = libs/cxxendian
+	url = https://github.com/NikolasK-source/cxxendian.git
+[submodule "libs/cxxsignal"]
+	path = libs/cxxsignal
+	url = https://github.com/NikolasK-source/cxxsignal.git
+[submodule "libs/cxxshm"]
+	path = libs/cxxshm
+	url = https://github.com/NikolasK-source/cxxshm.git
+[submodule "libs/cxxopts"]
+	path = libs/cxxopts
+	url = https://github.com/jarro2783/cxxopts.git

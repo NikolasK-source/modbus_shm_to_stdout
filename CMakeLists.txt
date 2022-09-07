@@ -9,11 +9,11 @@ cmake_minimum_required(VERSION 3.13.4 FATAL_ERROR)
 # ======================================================================================================================
 
 # project
-project(CMAKE_Template_Project LANGUAGES CXX VERSION 0.0.1)
+project(modbus-shm-to-stdout LANGUAGES CXX VERSION 0.0.1)
 
 # settings
-set(Target "Template_Project")    # Executable name (without file extension!)
-set(STANDARD 20)                  # C++ Standard
+set(Target "modbus-shm-to-stdout")    # Executable name (without file extension!)
+set(STANDARD 17)                  # C++ Standard
 set(ARCHITECTURE "native")        # CPU architecture to optimize for (only relevant if OPTIMIZE_FOR_ARCHITECTURE is ON)
 
 # options
