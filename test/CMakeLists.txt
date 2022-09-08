@@ -6,6 +6,8 @@
 add_executable(test_${Target} test.cpp)
 add_dependencies(test_${Target} ${Target})
 add_test(test_${Target} test_${Target})
+target_link_libraries(test_${Target} PRIVATE cxxshm)
+target_link_libraries(test_${Target} PRIVATE rt)
 
 enable_warnings(test_${Target})
 set_definitions(test_${Target})

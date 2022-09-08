@@ -158,7 +158,7 @@ int main(int argc, char **argv) {
     cxxitimer::ITimer_Real timer(static_cast<double>(cycle_ms) / 1000.0);
     timer.start();
 
-    if (!TerminateHandler::terminate()) {
+    if (!TerminateHandler::terminate() && !SINGLE_MODE) {
         init_out->cycle();
 
         do {
@@ -171,6 +171,8 @@ int main(int argc, char **argv) {
             }
 
             mb_out->cycle();
-        } while (!TerminateHandler::terminate() && !SINGLE_MODE);
+        } while (!TerminateHandler::terminate());
+    } else if (SINGLE_MODE) {
+        init_out->cycle();
     }
 }

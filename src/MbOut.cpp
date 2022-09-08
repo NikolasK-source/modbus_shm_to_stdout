@@ -175,13 +175,12 @@ void MbOut::output_signal(const MbOut::signal_t &signal) {
 
     switch (data_type_registers(signal.data_type) * register_bytes(signal.register_type)) {
         case 2: data.data16 = mem->at<uint16_t>(signal.base_index); break;
-        case 4:
-            data.data32 = *reinterpret_cast<uint32_t *>(reinterpret_cast<uint16_t *>(mem->get_addr()) +
-                                                        register_bytes(signal.register_type) * signal.base_index);
+        case 4: {
+            data.data32.u_data = *reinterpret_cast<uint32_t *>(mem->get_addr<uint16_t *>() + signal.base_index);
             break;
+        }
         case 8:
-            data.data64 = *reinterpret_cast<uint64_t *>(reinterpret_cast<uint16_t *>(mem->get_addr()) +
-                                                        register_bytes(signal.register_type) * signal.base_index);
+            data.data64.u_data = *reinterpret_cast<uint64_t *>(mem->get_addr<uint16_t *>() + signal.base_index);
             break;
         default: throw std::logic_error("unexpected load size");
     }
@@ -194,263 +193,225 @@ void MbOut::output_signal(const MbOut::signal_t &signal) {
         case data_type_t::x8_lo: out << std::hex << "i8_lo:" << static_cast<unsigned>(data.data16.ub[0]); break;
         case data_type_t::x8_hi: out << std::hex << "i8_hi:" << static_cast<unsigned>(data.data16.ub[1]); break;
         case data_type_t::u16l: {
-            cxxendian::LE_Int<uint16_t>   mem_e(data.data16.u_data);
-            cxxendian::Host_Int<uint16_t> hots_e(data.data16.u_data);
-            out << std::dec << "u16l:" << hots_e.get();
+            cxxendian::LE_Int<uint16_t> mem_e(data.data16.u_data);
+            out << std::dec << "u16l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::u16b: {
-            cxxendian::BE_Int<uint16_t>   mem_e(data.data16.u_data);
-            cxxendian::Host_Int<uint16_t> hots_e(data.data16.u_data);
-            out << std::dec << "u16b:" << hots_e.get();
+            cxxendian::BE_Int<uint16_t> mem_e(data.data16.u_data);
+            out << std::dec << "u16b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::i16l: {
-            cxxendian::LE_Int<int16_t>   mem_e(data.data16.i_data);
-            cxxendian::Host_Int<int16_t> hots_e(data.data16.i_data);
-            out << std::dec << "i16l:" << hots_e.get();
+            cxxendian::LE_Int<int16_t> mem_e(data.data16.i_data);
+            out << std::dec << "i16l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::i16b: {
-            cxxendian::BE_Int<int16_t>   mem_e(data.data16.i_data);
-            cxxendian::Host_Int<int16_t> hots_e(data.data16.i_data);
-            out << std::dec << "i16b:" << hots_e.get();
+            cxxendian::BE_Int<int16_t> mem_e(data.data16.i_data);
+            out << std::dec << "i16b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::x16l: {
-            cxxendian::LE_Int<uint16_t>   mem_e(data.data16.u_data);
-            cxxendian::Host_Int<uint16_t> hots_e(data.data16.u_data);
-            out << std::hex << "x16l:" << hots_e.get();
+            cxxendian::LE_Int<uint16_t> mem_e(data.data16.u_data);
+            out << std::hex << "x16l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::x16b: {
-            cxxendian::BE_Int<uint16_t>   mem_e(data.data16.u_data);
-            cxxendian::Host_Int<uint16_t> hots_e(data.data16.u_data);
-            out << std::hex << "x16b:" << hots_e.get();
+            cxxendian::BE_Int<uint16_t> mem_e(data.data16.u_data);
+            out << std::hex << "x16b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::u32l: {
-            cxxendian::LE_Int<uint32_t>   mem_e(data.data32.u_data);
-            cxxendian::Host_Int<uint32_t> hots_e(data.data32.u_data);
-            out << std::dec << "u32l:" << hots_e.get();
+            cxxendian::LE_Int<uint32_t> mem_e(data.data32.u_data);
+            out << std::dec << "u32l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::u32lr: {
             std::swap(data.data32.reg[0], data.data32.reg[1]);
-            cxxendian::LE_Int<uint32_t>   mem_e(data.data32.u_data);
-            cxxendian::Host_Int<uint32_t> hots_e(data.data32.u_data);
-            out << std::dec << "u32lr:" << hots_e.get();
+            cxxendian::LE_Int<uint32_t> mem_e(data.data32.u_data);
+            out << std::dec << "u32lr:" << mem_e.get_raw();
             break;
         }
         case data_type_t::u32b: {
-            cxxendian::BE_Int<uint32_t>   mem_e(data.data32.u_data);
-            cxxendian::Host_Int<uint32_t> hots_e(data.data32.u_data);
-            out << std::dec << "u32b:" << hots_e.get();
+            cxxendian::BE_Int<uint32_t> mem_e(data.data32.u_data);
+            out << std::dec << "u32b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::u32br: {
             std::swap(data.data32.reg[0], data.data32.reg[1]);
-            cxxendian::BE_Int<uint32_t>   mem_e(data.data32.u_data);
-            cxxendian::Host_Int<uint32_t> hots_e(data.data32.u_data);
-            out << std::dec << "u32br:" << hots_e.get();
+            cxxendian::BE_Int<uint32_t> mem_e(data.data32.u_data);
+            out << std::dec << "u32br:" << mem_e.get_raw();
             break;
         }
         case data_type_t::i32l: {
-            cxxendian::LE_Int<int32_t>   mem_e(data.data32.i_data);
-            cxxendian::Host_Int<int32_t> hots_e(data.data32.i_data);
-            out << std::dec << "i32l:" << hots_e.get();
+            cxxendian::LE_Int<int32_t> mem_e(data.data32.i_data);
+            out << std::dec << "i32l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::i32lr: {
             std::swap(data.data32.reg[0], data.data32.reg[1]);
-            cxxendian::LE_Int<int32_t>   mem_e(data.data32.i_data);
-            cxxendian::Host_Int<int32_t> hots_e(data.data32.i_data);
-            out << std::dec << "i32lr:" << hots_e.get();
+            cxxendian::LE_Int<int32_t> mem_e(data.data32.i_data);
+            out << std::dec << "i32lr:" << mem_e.get_raw();
             break;
         }
         case data_type_t::i32b: {
-            cxxendian::BE_Int<int32_t>   mem_e(data.data32.i_data);
-            cxxendian::Host_Int<int32_t> hots_e(data.data32.i_data);
-            out << std::dec << "i32b:" << hots_e.get();
+            cxxendian::BE_Int<int32_t> mem_e(data.data32.i_data);
+            out << std::dec << "i32b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::i32br: {
             std::swap(data.data32.reg[0], data.data32.reg[1]);
-            cxxendian::BE_Int<int32_t>   mem_e(data.data32.i_data);
-            cxxendian::Host_Int<int32_t> hots_e(data.data32.i_data);
-            out << std::dec << "i32br:" << hots_e.get();
+            cxxendian::BE_Int<int32_t> mem_e(data.data32.i_data);
+            out << std::dec << "i32br:" << mem_e.get_raw();
             break;
         }
         case data_type_t::x32l: {
-            cxxendian::LE_Int<uint32_t>   mem_e(data.data32.u_data);
-            cxxendian::Host_Int<uint32_t> hots_e(data.data32.u_data);
-            out << std::hex << "x32l:" << hots_e.get();
+            cxxendian::LE_Int<uint32_t> mem_e(data.data32.u_data);
+            out << std::hex << "x32l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::x32lr: {
             std::swap(data.data32.reg[0], data.data32.reg[1]);
-            cxxendian::LE_Int<uint32_t>   mem_e(data.data32.u_data);
-            cxxendian::Host_Int<uint32_t> hots_e(data.data32.u_data);
-            out << std::hex << "x32lr:" << hots_e.get();
+            cxxendian::LE_Int<uint32_t> mem_e(data.data32.u_data);
+            out << std::hex << "x32lr:" << mem_e.get_raw();
             break;
         }
         case data_type_t::x32b: {
-            cxxendian::BE_Int<uint32_t>   mem_e(data.data32.u_data);
-            cxxendian::Host_Int<uint32_t> hots_e(data.data32.u_data);
-            out << std::hex << "x32b:" << hots_e.get();
+            cxxendian::BE_Int<uint32_t> mem_e(data.data32.u_data);
+            out << std::hex << "x32b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::x32br: {
             std::swap(data.data32.reg[0], data.data32.reg[1]);
-            cxxendian::BE_Int<uint32_t>   mem_e(data.data32.u_data);
-            cxxendian::Host_Int<uint32_t> hots_e(data.data32.u_data);
-            out << std::hex << "x32br:" << hots_e.get();
+            cxxendian::BE_Int<uint32_t> mem_e(data.data32.u_data);
+            out << std::hex << "x32br:" << mem_e.get_raw();
             break;
         }
         case data_type_t::f32l: {
-            cxxendian::LE_Float<float>   mem_e(data.data32.f_data);
-            cxxendian::Host_Float<float> hots_e(data.data32.f_data);
+            cxxendian::LE_Float<float> mem_e(data.data32.f_data);
             out << std::scientific << std::setprecision(std::numeric_limits<float>::digits10)
-                << "f32l:" << hots_e.get();
+                << "f32l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::f32lr: {
             std::swap(data.data32.reg[0], data.data32.reg[1]);
-            cxxendian::LE_Float<float>   mem_e(data.data32.f_data);
-            cxxendian::Host_Float<float> hots_e(data.data32.f_data);
+            cxxendian::LE_Float<float> mem_e(data.data32.f_data);
             out << std::scientific << std::setprecision(std::numeric_limits<float>::digits10)
-                << "f32lr:" << hots_e.get();
+                << "f32lr:" << mem_e.get_raw();
             break;
         }
         case data_type_t::f32b: {
-            cxxendian::BE_Float<float>   mem_e(data.data32.f_data);
-            cxxendian::Host_Float<float> hots_e(data.data32.f_data);
+            cxxendian::BE_Float<float> mem_e(data.data32.f_data);
             out << std::scientific << std::setprecision(std::numeric_limits<float>::digits10)
-                << "f32b:" << hots_e.get();
+                << "f32b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::f32br: {
             std::swap(data.data32.reg[0], data.data32.reg[1]);
-            cxxendian::BE_Float<float>   mem_e(data.data32.f_data);
-            cxxendian::Host_Float<float> hots_e(data.data32.f_data);
+            cxxendian::BE_Float<float> mem_e(data.data32.f_data);
             out << std::scientific << std::setprecision(std::numeric_limits<float>::digits10)
-                << "f32br:" << hots_e.get();
+                << "f32br:" << mem_e.get_raw();
             break;
         }
         case data_type_t::u64l: {
-            cxxendian::LE_Int<uint64_t>   mem_e(data.data64.u_data);
-            cxxendian::Host_Int<uint64_t> hots_e(data.data64.u_data);
-            out << std::dec << "u64l:" << hots_e.get();
+            cxxendian::LE_Int<uint64_t> mem_e(data.data64.u_data);
+            out << std::dec << "u64l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::u64lr: {
             std::swap(data.data64.reg[0], data.data64.reg[3]);
             std::swap(data.data64.reg[1], data.data64.reg[2]);
-            cxxendian::LE_Int<uint64_t>   mem_e(data.data64.u_data);
-            cxxendian::Host_Int<uint64_t> hots_e(data.data64.u_data);
-            out << std::dec << "u64lr:" << hots_e.get();
+            cxxendian::LE_Int<uint64_t> mem_e(data.data64.u_data);
+            out << std::dec << "u64lr:" << mem_e.get_raw();
             break;
         }
         case data_type_t::u64b: {
-            cxxendian::BE_Int<uint64_t>   mem_e(data.data64.u_data);
-            cxxendian::Host_Int<uint64_t> hots_e(data.data64.u_data);
-            out << std::dec << "u64b:" << hots_e.get();
+            cxxendian::BE_Int<uint64_t> mem_e(data.data64.u_data);
+            out << std::dec << "u64b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::u64br: {
             std::swap(data.data64.reg[0], data.data64.reg[3]);
             std::swap(data.data64.reg[1], data.data64.reg[2]);
-            cxxendian::BE_Int<uint64_t>   mem_e(data.data64.u_data);
-            cxxendian::Host_Int<uint64_t> hots_e(data.data64.u_data);
-            out << std::dec << "u64br:" << hots_e.get();
+            cxxendian::BE_Int<uint64_t> mem_e(data.data64.u_data);
+            out << std::dec << "u64br:" << mem_e.get_raw();
             break;
         }
         case data_type_t::i64l: {
-            cxxendian::LE_Int<int64_t>   mem_e(data.data64.i_data);
-            cxxendian::Host_Int<int64_t> hots_e(data.data64.i_data);
-            out << std::dec << "i64l:" << hots_e.get();
+            cxxendian::LE_Int<int64_t> mem_e(data.data64.i_data);
+            out << std::dec << "i64l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::i64lr: {
             std::swap(data.data64.reg[0], data.data64.reg[3]);
             std::swap(data.data64.reg[1], data.data64.reg[2]);
-            cxxendian::LE_Int<int64_t>   mem_e(data.data64.i_data);
-            cxxendian::Host_Int<int64_t> hots_e(data.data64.i_data);
-            out << std::dec << "i64lr:" << hots_e.get();
+            cxxendian::LE_Int<int64_t> mem_e(data.data64.i_data);
+            out << std::dec << "i64lr:" << mem_e.get_raw();
             break;
         }
         case data_type_t::i64b: {
-            cxxendian::BE_Int<int64_t>   mem_e(data.data64.i_data);
-            cxxendian::Host_Int<int64_t> hots_e(data.data64.i_data);
-            out << std::dec << "i64b:" << hots_e.get();
+            cxxendian::BE_Int<int64_t> mem_e(data.data64.i_data);
+            out << std::dec << "i64b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::i64br: {
             std::swap(data.data64.reg[0], data.data64.reg[3]);
             std::swap(data.data64.reg[1], data.data64.reg[2]);
-            cxxendian::BE_Int<int64_t>   mem_e(data.data64.i_data);
-            cxxendian::Host_Int<int64_t> hots_e(data.data64.i_data);
-            out << std::dec << "i64br:" << hots_e.get();
+            cxxendian::BE_Int<int64_t> mem_e(data.data64.i_data);
+            out << std::dec << "i64br:" << mem_e.get_raw();
             break;
         }
         case data_type_t::x64l: {
-            cxxendian::LE_Int<uint64_t>   mem_e(data.data64.u_data);
-            cxxendian::Host_Int<uint64_t> hots_e(data.data64.u_data);
-            out << std::hex << "x64l:" << hots_e.get();
+            cxxendian::LE_Int<uint64_t> mem_e(data.data64.u_data);
+            out << std::hex << "x64l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::x64lr: {
             std::swap(data.data64.reg[0], data.data64.reg[3]);
             std::swap(data.data64.reg[1], data.data64.reg[2]);
-            cxxendian::LE_Int<uint64_t>   mem_e(data.data64.u_data);
-            cxxendian::Host_Int<uint64_t> hots_e(data.data64.u_data);
-            out << std::hex << "x64lr:" << hots_e.get();
+            cxxendian::LE_Int<uint64_t> mem_e(data.data64.u_data);
+            out << std::hex << "x64lr:" << mem_e.get_raw();
             break;
         }
         case data_type_t::x64b: {
-            cxxendian::BE_Int<uint64_t>   mem_e(data.data64.u_data);
-            cxxendian::Host_Int<uint64_t> hots_e(data.data64.u_data);
-            out << std::hex << "x64b:" << hots_e.get();
+            cxxendian::BE_Int<uint64_t> mem_e(data.data64.u_data);
+            out << std::hex << "x64b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::x64br: {
             std::swap(data.data64.reg[0], data.data64.reg[3]);
             std::swap(data.data64.reg[1], data.data64.reg[2]);
-            cxxendian::BE_Int<uint64_t>   mem_e(data.data64.u_data);
-            cxxendian::Host_Int<uint64_t> hots_e(data.data64.u_data);
-            out << std::hex << "x64br:" << hots_e.get();
+            cxxendian::BE_Int<uint64_t> mem_e(data.data64.u_data);
+            out << std::hex << "x64br:" << mem_e.get_raw();
             break;
         }
         case data_type_t::f64l: {
-            cxxendian::LE_Float<double>   mem_e(data.data64.f_data);
-            cxxendian::Host_Float<double> hots_e(data.data64.f_data);
+            cxxendian::LE_Float<double> mem_e(data.data64.f_data);
             out << std::scientific << std::setprecision(std::numeric_limits<double>::digits10)
-                << "f64l:" << hots_e.get();
+                << "f64l:" << mem_e.get_raw();
             break;
         }
         case data_type_t::f64lr: {
             std::swap(data.data64.reg[0], data.data64.reg[3]);
             std::swap(data.data64.reg[1], data.data64.reg[2]);
-            cxxendian::LE_Float<double>   mem_e(data.data64.f_data);
-            cxxendian::Host_Float<double> hots_e(data.data64.f_data);
+            cxxendian::LE_Float<double> mem_e(data.data64.f_data);
             out << std::scientific << std::setprecision(std::numeric_limits<double>::digits10)
-                << "f64lr:" << hots_e.get();
+                << "f64lr:" << mem_e.get_raw();
             break;
         }
         case data_type_t::f64b: {
-            cxxendian::BE_Float<double>   mem_e(data.data64.f_data);
-            cxxendian::Host_Float<double> hots_e(data.data64.f_data);
+            cxxendian::BE_Float<double> mem_e(data.data64.f_data);
             out << std::scientific << std::setprecision(std::numeric_limits<double>::digits10)
-                << "f64b:" << hots_e.get();
+                << "f64b:" << mem_e.get_raw();
             break;
         }
         case data_type_t::f64br: {
             std::swap(data.data64.reg[0], data.data64.reg[3]);
             std::swap(data.data64.reg[1], data.data64.reg[2]);
-            cxxendian::BE_Float<double>   mem_e(data.data64.f_data);
-            cxxendian::Host_Float<double> hots_e(data.data64.f_data);
+            cxxendian::BE_Float<double> mem_e(data.data64.f_data);
             out << std::scientific << std::setprecision(std::numeric_limits<double>::digits10)
-                << "f64br:" << hots_e.get();
+                << "f64br:" << mem_e.get_raw();
             break;
         }
         default: throw std::logic_error("unknown data type");

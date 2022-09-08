@@ -1,4 +1,5 @@
 do:0
 do:1
 ao:0:x16l
-ao:1:f32l
+ao:2:f32l
+ao:4:x16b
