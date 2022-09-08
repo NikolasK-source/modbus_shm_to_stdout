@@ -4,7 +4,11 @@
  */
 
 #include "CyclicOut.hpp"
+
+#include <ostream>
+
 void CyclicOut::cycle() {
     for (const auto &signal : signals)
         output_signal(signal);
+    out << std::flush;
 }

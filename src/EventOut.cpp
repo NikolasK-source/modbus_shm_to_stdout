@@ -4,8 +4,10 @@
  */
 
 #include <cstring>
+#include <ostream>
 
 #include "EventOut.hpp"
+
 EventOut::EventOut(const std::string &path, std::ostream &out, const std::string &name_prefix)
     : MbOut(path, out, name_prefix) {
     local_do = std::make_unique<uint8_t[]>(modbus_do.get_size());
@@ -20,6 +22,7 @@ EventOut::EventOut(const std::string &path, std::ostream &out, const std::string
 }
 
 void EventOut::cycle() {
+    bool output = false;
     for (const auto &signal : signals) {
         bool diff  = false;
         auto cells = data_type_registers(signal.data_type);
@@ -34,31 +37,41 @@ void EventOut::cycle() {
                 break;
             case register_type_t::AO:
                 for (size_t i = 0; i < cells; ++i) {
-                    diff = diff | local_ao[signal.base_index] != modbus_ao.at<uint16_t>(signal.base_index);
-                    break;
+                    if (local_ao[signal.base_index + i] != modbus_ao.at<uint16_t>(signal.base_index + i)) {
+                        diff = true;
+                        break;
+                    }
                 }
+                break;
             case register_type_t::AI:
                 for (size_t i = 0; i < cells; ++i) {
-                    diff = diff | local_ai[signal.base_index] != modbus_ai.at<uint16_t>(signal.base_index);
-                    break;
+                    if (local_ai[signal.base_index + i] != modbus_ai.at<uint16_t>(signal.base_index + i)) {
+                        diff = true;
+                        break;
+                    }
                 }
-        };
+                break;
+        }
 
         if (diff) {
+            output = true;
             output_signal(signal);
             switch (signal.register_type) {
                 case register_type_t::DO: local_do[signal.base_index] = modbus_do.at<uint8_t>(signal.base_index); break;
                 case register_type_t::DI: local_di[signal.base_index] = modbus_di.at<uint8_t>(signal.base_index); break;
                 case register_type_t::AO:
                     for (size_t i = 0; i < cells; ++i) {
-                        local_ao[signal.base_index] = modbus_ao.at<uint16_t>(signal.base_index);
+                        local_ao[signal.base_index + i] = modbus_ao.at<uint16_t>(signal.base_index + i);
                     }
+                    break;
                 case register_type_t::AI:
                     for (size_t i = 0; i < cells; ++i) {
-                        local_ai[signal.base_index] = modbus_ai.at<uint16_t>(signal.base_index);
-                        break;
+                        local_ai[signal.base_index + i] = modbus_ai.at<uint16_t>(signal.base_index + i);
                     }
+                    break;
             };
         }
+
+        if (output) out << std::flush;
     }
 }
