@@ -7,11 +7,22 @@
 # ======================================================================================================================
 
 target_sources(${Target} PRIVATE main.cpp)
+target_sources(${Target} PRIVATE data_types.cpp)
+target_sources(${Target} PRIVATE MbOut.cpp)
+target_sources(${Target} PRIVATE CyclicOut.cpp)
+target_sources(${Target} PRIVATE license.cpp)
+target_sources(${Target} PRIVATE EventOut.cpp)
 
 
 # ---------------------------------------- header files (*.jpp, *.h, ...) ----------------------------------------------
 # ======================================================================================================================
 
+target_sources(${Target} PRIVATE data_types.hpp)
+target_sources(${Target} PRIVATE MbOut.hpp)
+target_sources(${Target} PRIVATE split_string.hpp)
+target_sources(${Target} PRIVATE CyclicOut.hpp)
+target_sources(${Target} PRIVATE license.hpp)
+target_sources(${Target} PRIVATE EventOut.hpp)
 
 
 # ---------------------------------------- subdirectories --------------------------------------------------------------
